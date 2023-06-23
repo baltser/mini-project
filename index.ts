@@ -8,7 +8,6 @@ class ResultBlock{
     }
     private get hash() {
         const data:string = this.text + this.i;
-        console.log(data)
        return  this.hashResult = crypto
             .createHash('sha256')
             .update(data)
