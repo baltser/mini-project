@@ -1,35 +1,34 @@
-
+import * as crypto from "crypto";
 class ResultBlock{
     private i: number = 0;
-    private hashResult: string | undefined;
-    private captcha: string | undefined;
+    private hashResult: string = this.hash;
     constructor(private readonly text: string, private readonly key: string) {
         this.text = text;
         this.key =  key;
     }
-    private  calculateHashWithNonce(): void {
-        this.captcha = this.text + this.i.toString()
+    private get hash() {
+        const data:string = this.text + this.i;
+        console.log(data)
+       return  this.hashResult = crypto
+            .createHash('sha256')
+            .update(data)
+            .digest('hex')
     }
-    private async hash(): Promise<void> {
-        const data: Uint8Array =  new TextEncoder()
-            .encode(this.captcha);
-         this.hashResult = Array.from(new Uint8Array(
-             await crypto.subtle.digest("SHA-256", data)))
-                .map((b:number) => b.toString(16)
-                 .padStart(2, "0"))
-                .join("");
-    }
-    public async mine(): Promise<void> {
+    public mine(): { index: number, hashResult: string } {
 
-        while (this.hashResult?.slice(0, this.key.length) !== this.key){
-            this.calculateHashWithNonce()
-            await this.hash()
+        while (!this.hashResult.startsWith(this.key)){
             this.i++ ;
+            this.hash;
         }
-        console.log(this.hashResult)
+        return {
+            hashResult : this.hashResult,
+           index: this.i
+        }
     }
 }
- new ResultBlock('Hallo', 'c5ca3').mine()
+const block = new ResultBlock('Hello World', '000')
+const { index, hashResult } = block.mine()
+console.log(index, hashResult)
 
 
 
